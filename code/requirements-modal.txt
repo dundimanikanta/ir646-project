@@ -1,0 +1,2 @@
+# Local launcher only; CUDA/ML dependencies are installed inside the Modal image.
+modal==1.6.3

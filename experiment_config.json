@@ -1,0 +1,154 @@
+{
+  "baseline": "Baseline 4: raw current reasoning plus current query",
+  "model": "Qwen/Qwen3-Embedding-0.6B",
+  "model_revision": "97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3",
+  "training_data": {
+    "dataset": "Tevatron/AgentIR-data",
+    "file": "webshaper_train.jsonl",
+    "rows": 5238
+  },
+  "completed_bf16_stage_settings": {
+    "seed": 42,
+    "epochs": 2,
+    "batch_size": 4,
+    "gradient_accumulation": 2,
+    "learning_rate": 0.0001,
+    "temperature": 0.01,
+    "train_group_size": 8,
+    "query_tokens": 8192,
+    "passage_tokens": 4096,
+    "eval_query_tokens": 8192,
+    "lora_r": 16,
+    "lora_alpha": 64,
+    "lora_dropout": 0.1,
+    "lora_target_modules": "q_proj,k_proj,v_proj,o_proj,down_proj,up_proj,gate_proj",
+    "weight_decay": 0.0,
+    "warmup_ratio": 0.1,
+    "max_grad_norm": 1.0,
+    "fp16": false,
+    "bf16": true,
+    "attention": "flash_attention_2",
+    "doc_batch_size": 4,
+    "query_batch_size": 4,
+    "search_batch_size": 64,
+    "top_k": 10,
+    "save_steps": 25,
+    "input_variant": "raw_current_reasoning_plus_query",
+    "query_truncation": "trim_reasoning_start_preserve_current_query_v2",
+    "passage_truncation": "right"
+  },
+  "model_reuse_note": "Use the supplied final adapter with the pinned base for the reported model. Settings describe the completed BF16 stage; fresh training is a new experiment.",
+  "evaluation": {
+    "agents": [
+      "tongyi-dr",
+      "gpt-oss-120b-high",
+      "qwen35-35b-a3b",
+      "ds4pro",
+      "kimi26",
+      "glm51"
+    ],
+    "questions": 830,
+    "documents": 100195,
+    "qrels_commit": "046949032b0328319cc9a02663a759ec601d9402",
+    "protocol": "fixed_offline_replay_all_830_no_model_selection",
+    "input": "raw current reasoning plus current query",
+    "inference_precision": "fp16",
+    "pooling": "last non-padding token",
+    "l2_normalization": true,
+    "embedding_dimensions": 1024,
+    "retrieval": "exact FAISS IndexFlatIP",
+    "retrieved_documents": 10
+  },
+  "revisions": {
+    "Qwen/Qwen3-Embedding-0.6B": "97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3",
+    "Tevatron/AgentIR-data": "49de17cf11ba1ea4c5ae7699e2d146ca5d4ab6f2",
+    "Tevatron/browsecomp-plus": "144cff8e35b5eaef7e526346aa60774a9deb941f",
+    "liuqi6777/bcp_search_agent_trajectory": "af778a3994cfcb30a8a9ab5abcbcb7c7fcbf645f",
+    "Tevatron/browsecomp-plus-corpus": "b27b02bc3e45511b8b82a13e6f90ce761df726f6"
+  },
+  "implementation": {
+    "agentir_commit": "9102796661c0cbc4e6c8c0a9d9bcaca667a8345b",
+    "tevatron_commit": "6555f12c844c64f020f5762096405a7ce5148b77",
+    "image": "nvidia/cuda:12.6.3-cudnn-devel-ubuntu22.04;python=3.11",
+    "packages": [
+      "torch==2.7.1",
+      "torchvision==0.22.1",
+      "transformers==4.53.2",
+      "peft==0.18.0",
+      "accelerate==1.10.1",
+      "datasets==4.0.0",
+      "huggingface_hub==0.36.0",
+      "deepspeed==0.17.2",
+      "numpy==1.26.4",
+      "pandas==2.2.3",
+      "pyarrow==20.0.0",
+      "faiss-cpu==1.11.0.post1",
+      "qwen-omni-utils==0.0.8",
+      "pillow==11.2.1",
+      "requests==2.32.4",
+      "ninja==1.11.1.4",
+      "packaging==25.0",
+      "wheel==0.45.1",
+      "setuptools==80.9.0",
+      "flash-attn==2.8.3"
+    ],
+    "deepspeed": {
+      "zero_optimization": {
+        "stage": 3,
+        "offload_optimizer": {
+          "device": "none",
+          "pin_memory": true
+        },
+        "offload_param": {
+          "device": "none",
+          "pin_memory": true
+        },
+        "overlap_comm": true,
+        "contiguous_gradients": true,
+        "sub_group_size": 1000000000.0,
+        "reduce_bucket_size": 1000000.0,
+        "stage3_prefetch_bucket_size": "auto",
+        "stage3_param_persistence_threshold": "auto",
+        "stage3_max_live_parameters": 1000000000.0,
+        "stage3_max_reuse_distance": 1000000000.0,
+        "stage3_gather_16bit_weights_on_model_save": true
+      },
+      "fp16": {
+        "enabled": false,
+        "loss_scale": 0,
+        "initial_scale_power": 10,
+        "loss_scale_window": 1000,
+        "hysteresis": 2,
+        "min_loss_scale": 0
+      },
+      "bf16": {
+        "enabled": true
+      },
+      "optimizer": {
+        "type": "AdamW",
+        "params": {
+          "lr": "auto",
+          "betas": "auto",
+          "eps": "auto",
+          "weight_decay": "auto",
+          "torch_adam": true
+        }
+      },
+      "scheduler": {
+        "type": "WarmupDecayLR",
+        "params": {
+          "warmup_min_lr": "auto",
+          "warmup_max_lr": "auto",
+          "warmup_num_steps": "auto",
+          "total_num_steps": "auto"
+        }
+      },
+      "gradient_accumulation_steps": "auto",
+      "gradient_clipping": "auto",
+      "steps_per_print": 1000,
+      "train_batch_size": "auto",
+      "train_micro_batch_size_per_gpu": "auto",
+      "wall_clock_breakdown": false
+    }
+  }
+}
